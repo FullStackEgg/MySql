@@ -124,3 +124,71 @@ SELECT MAX(sal_emp) AS 'Salario Mas alto' FROM empleados;
 SELECT * FROM empleados WHERE sal_emp = (SELECT MAX(sal_emp) From empleados);
 
 # 21. Mostrar el nombre del último empleado de la lista por orden alfabético.
+SELECT MAX(nombre) FROM empleados ORDER BY nombre DESC;
+
+# 22. Hallar el salario más alto, el más bajo y la diferencia entre ellos.
+SELECT 
+    MAX(sal_emp) AS 'Salario mas alto',
+    MIN(sal_emp) AS 'Salario mas bajo',
+    (MAX(sal_emp) - MIN(sal_emp)) AS 'Diferencia'
+FROM
+    empleados;
+    
+# 23. Hallar el salario promedio por departamento.
+SELECT 
+    departamentos.nombre_depto AS 'DEPARTAMENTO',
+    AVG(empleados.sal_emp) AS 'PROMEDIO SALARIO' # calculamos el promedio de salario
+FROM
+    empleados
+        INNER JOIN # conectamos con la tabla departamento mediante id_depto
+    departamentos ON departamentos.id_depto = empleados.id_depto
+GROUP BY nombre_depto; # Ordenamos por depto por ende nos muestra los valores totales de c/u de los deptos
+
+# 24. Hallar los departamentos que tienen más de tres empleados. Mostrar el número
+# de empleados de esos departamentos.
+SELECT 
+    departamentos.nombre_depto AS 'Departamento',
+    COUNT(empleados.id_emp) AS 'CantEmpleados'
+FROM
+    empleados
+        INNER JOIN
+    departamentos ON departamentos.id_depto = empleados.id_depto
+GROUP BY departamentos.nombre_depto
+HAVING COUNT(id_emp) > 3;
+
+# 25. Mostrar el código y nombre de cada jefe, junto al número de empleados que
+# dirige. Solo los que tengan más de dos empleados (2 incluido).
+SELECT 
+    empleados.cod_jefe AS 'Codigo Jefe',
+    empleados.nombre AS 'Nombre',
+    COUNT(empleados.id_emp) AS 'CantEmpleados'
+FROM
+	empleados
+GROUP BY empleados.cod_jefe
+HAVING COUNT(id_emp) >= 2;
+
+# 26. Hallar los departamentos que no tienen empleados
+SELECT 
+    departamentos.nombre_depto AS 'Departamento',
+    COUNT(empleados.id_emp) AS 'CantEmpleados'
+FROM
+    empleados
+        INNER JOIN
+    departamentos ON departamentos.id_depto = empleados.id_depto
+GROUP BY departamentos.nombre_depto
+HAVING COUNT(id_emp) = 0;
+
+# Consulta con Subconsulta
+# 27. Mostrar la lista de los empleados cuyo salario es mayor o igual que el promedio
+# de la empresa. Ordenarlo por departamento.
+SELECT 
+    departamentos.nombre_depto AS 'Departamento',
+    empleados.nombre AS 'Nombre',
+    empleados.sal_emp AS 'Salario'
+FROM
+    empleados
+        INNER JOIN
+    departamentos ON departamentos.id_depto = empleados.id_depto
+WHERE
+    empleados.sal_emp >= (SELECT AVG(sal_emp) FROM empleados)
+ORDER BY departamentos.nombre_depto;
